@@ -1,11 +1,19 @@
 #!/bin/bash
 # Run this once a week (or anytime) to refresh the dashboard data.
-# Requires: pip install google-cloud-bigquery google-auth
 
 set -e
 
+cd "$(dirname "$0")"
+
+# Create virtual environment on first run
+if [ ! -d ".venv" ]; then
+  echo "Setting up Python environment (first run only)..."
+  python3 -m venv .venv
+  .venv/bin/pip install --quiet google-cloud-bigquery
+fi
+
 echo "Fetching adoption data from BigQuery..."
-python3 fetch_data.py
+.venv/bin/python fetch_data.py
 
 echo "Pushing to GitHub..."
 git add data/adoptions.json
