@@ -1,0 +1,46 @@
+# Runs daily at 9 AM CDT throughout August and can be triggered manually.
+# Setup required:
+#   1. Create a GCP service account with the BigQuery Data Viewer role on apa-data-410213
+#   2. Download its JSON key
+#   3. Add it as a GitHub secret named GCP_SA_KEY (Settings > Secrets > Actions)
+#   4. Enable GitHub Pages on this repo (Settings > Pages > Deploy from branch: main, root /)
+
+name: Update CTS Adoption Data
+
+on:
+  schedule:
+    - cron: '0 14 * 8 *'  # 9 AM CDT (14:00 UTC) every day in August
+  workflow_dispatch:        # Manual trigger anytime
+
+permissions:
+  contents: write
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install google-cloud-bigquery
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Fetch adoption data
+        run: python fetch_data.py
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/adoptions.json
+          git diff --staged --quiet || git commit -m "Update adoption data $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push

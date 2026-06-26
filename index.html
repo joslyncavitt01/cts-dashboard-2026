@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APA! Clear the Shelters 2026</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f4f6fb;
+      color: #1a1a2e;
+    }
+
+    /* ---- Header ---- */
+    header {
+      background: #1e1e1e;
+      color: white;
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+    header img {
+      height: 72px;
+      object-fit: contain;
+    }
+    .header-titles h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .header-titles p {
+      font-size: 0.82rem;
+      opacity: 0.65;
+      margin-top: 3px;
+    }
+    .live-badge {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    /* ---- Layout ---- */
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+
+    .updated-line {
+      font-size: 0.78rem;
+      color: #999;
+      margin-bottom: 22px;
+    }
+
+    /* ---- Stat cards ---- */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px 22px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+    .stat-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #999;
+      margin-bottom: 8px;
+    }
+    .stat-value {
+      font-size: 2.4rem;
+      font-weight: 800;
+      line-height: 1;
+      color: #003B71;
+    }
+    .stat-card.dogs .stat-value { color: #D95A2B; }
+    .stat-card.cats .stat-value { color: #8DC63F; }
+
+    /* ---- Sections ---- */
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 3px;
+    }
+    .card-subtitle {
+      font-size: 0.78rem;
+      color: #aaa;
+      margin-bottom: 20px;
+    }
+
+    /* ---- Weekly table ---- */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    thead th {
+      text-align: left;
+      padding: 9px 12px;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #bbb;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    tbody td {
+      padding: 13px 12px;
+      border-bottom: 1px solid #f5f5f5;
+      vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    .week-label { font-weight: 600; }
+    .week-dates { font-size: 0.78rem; color: #bbb; }
+    .week-total { font-weight: 800; font-size: 1.05rem; color: #003B71; }
+    .pill {
+      display: inline-block;
+      padding: 3px 11px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .pill.dog { background: #fff0eb; color: #D95A2B; }
+    .pill.cat { background: #eef3fd; color: #8DC63F; }
+    .note {
+      font-size: 0.73rem;
+      color: #bbb;
+      font-style: italic;
+      margin-top: 14px;
+    }
+
+    /* ---- Crescendo ---- */
+    .crescendo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .day-card {
+      border: 2px solid #eee;
+      border-radius: 10px;
+      padding: 18px 14px;
+      text-align: center;
+    }
+    .day-card.spotlight {
+      border-color: #D95A2B;
+      background: linear-gradient(135deg, #fff8f5 0%, #fff 100%);
+    }
+    .day-tag {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #bbb;
+      margin-bottom: 5px;
+    }
+    .day-card.spotlight .day-tag { color: #D95A2B; }
+    .day-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 12px;
+    }
+    .day-card.spotlight .day-name { color: #D95A2B; }
+    .day-total {
+      font-size: 2.6rem;
+      font-weight: 900;
+      color: #003B71;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+    .day-breakdown {
+      font-size: 0.76rem;
+      color: #bbb;
+    }
+
+    /* ---- Chart ---- */
+    .chart-wrap { height: 210px; }
+
+    /* ---- Footer ---- */
+    footer {
+      text-align: center;
+      font-size: 0.72rem;
+      color: #ccc;
+      padding: 20px;
+    }
+
+    @media (max-width: 580px) {
+      .stat-row { grid-template-columns: 1fr; }
+      .crescendo-grid { grid-template-columns: 1fr; }
+      .live-badge { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="apa-logo.png" alt="Austin Pets Alive!" onerror="this.style.display='none'">
+  <div class="header-titles">
+    <h1>Clear the Shelters 2026</h1>
+    <p>Adoption Tracker — Austin Pets Alive!</p>
+  </div>
+  <div class="live-badge">
+    <span class="dot"></span>
+    <span id="badge-text">Loading...</span>
+  </div>
+</header>
+
+<main>
+  <div class="updated-line" id="updated-line"></div>
+
+  <!-- Summary -->
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-label">Total Adoptions</div>
+      <div class="stat-value" id="stat-total">--</div>
+    </div>
+    <div class="stat-card dogs">
+      <div class="stat-label">Dogs</div>
+      <div class="stat-value" id="stat-dogs">--</div>
+    </div>
+    <div class="stat-card cats">
+      <div class="stat-label">Cats</div>
+      <div class="stat-value" id="stat-cats">--</div>
+    </div>
+  </div>
+
+  <!-- NBC Weekly Table -->
+  <div class="card">
+    <div class="card-title">NBC Weekly Report</div>
+    <div class="card-subtitle">Total adoptions per week — August 1 through 31, 2026</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Week</th>
+          <th>Dates</th>
+          <th>Dogs</th>
+          <th>Cats</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody id="weekly-tbody"></tbody>
+    </table>
+    <p class="note">Includes adoptions, pre-adoptions, and foster-to-adopt outcomes. Name your own fee applied all month.</p>
+  </div>
+
+  <!-- Crescendo Weekend -->
+  <div class="card">
+    <div class="card-title">Crescendo Weekend</div>
+    <div class="card-subtitle">August 27, 28, and 29 — Town Lake Animal Center</div>
+    <div class="crescendo-grid" id="crescendo-grid"></div>
+  </div>
+
+  <!-- Chart -->
+  <div class="card">
+    <div class="card-title">Dogs vs. Cats by Week</div>
+    <div class="card-subtitle">August 2026</div>
+    <div class="chart-wrap">
+      <canvas id="species-chart"></canvas>
+    </div>
+  </div>
+</main>
+
+<footer>
+  Austin Pets Alive! &bull; Data from ShelterLuv via BigQuery &bull; Refreshes daily at 9 AM CDT
+</footer>
+
+<script>
+  const CRESCENDO_META = {
+    "2026-08-27": { tag: "Aug 27", name: "Thursday" },
+    "2026-08-28": { tag: "Aug 28", name: "Crescendo Day", spotlight: true },
+    "2026-08-29": { tag: "Aug 29", name: "Saturday" },
+  };
+
+  function fmtDate(iso) {
+    const [, m, d] = iso.split('-');
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return months[+m - 1] + ' ' + +d;
+  }
+
+  async function init() {
+    let data;
+    try {
+      const r = await fetch('data/adoptions.json?_=' + Date.now());
+      data = await r.json();
+    } catch {
+      document.getElementById('badge-text').textContent = 'Error loading data';
+      return;
+    }
+
+    // Badge + updated line
+    document.getElementById('badge-text').textContent = 'Live Data';
+    const updated = new Date(data.lastUpdated);
+    document.getElementById('updated-line').textContent =
+      'Last updated: ' + updated.toLocaleString('en-US', {
+        timeZone: 'America/Chicago',
+        month: 'long', day: 'numeric', year: 'numeric',
+        hour: 'numeric', minute: '2-digit', timeZoneName: 'short'
+      });
+
+    // Summary cards
+    document.getElementById('stat-total').textContent = data.totals.total.toLocaleString();
+    document.getElementById('stat-dogs').textContent  = data.totals.dogs.toLocaleString();
+    document.getElementById('stat-cats').textContent  = data.totals.cats.toLocaleString();
+
+    // Weekly table
+    const tbody = document.getElementById('weekly-tbody');
+    data.weeks.forEach(w => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="week-label">${w.label}</td>
+        <td class="week-dates">${fmtDate(w.start)} – ${fmtDate(w.end)}</td>
+        <td><span class="pill dog">${w.dogs.toLocaleString()}</span></td>
+        <td><span class="pill cat">${w.cats.toLocaleString()}</span></td>
+        <td class="week-total">${w.total.toLocaleString()}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Crescendo grid
+    const grid = document.getElementById('crescendo-grid');
+    Object.entries(CRESCENDO_META).forEach(([date, meta]) => {
+      const d = data.crescendo[date] || { total: 0, dogs: 0, cats: 0 };
+      const div = document.createElement('div');
+      div.className = 'day-card' + (meta.spotlight ? ' spotlight' : '');
+      div.innerHTML = `
+        <div class="day-tag">${meta.tag}</div>
+        <div class="day-name">${meta.name}</div>
+        <div class="day-total">${d.total.toLocaleString()}</div>
+        <div class="day-breakdown">${d.dogs} dogs &bull; ${d.cats} cats</div>
+      `;
+      grid.appendChild(div);
+    });
+
+    // Chart
+    new Chart(document.getElementById('species-chart').getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: data.weeks.map(w => w.label),
+        datasets: [
+          {
+            label: 'Dogs',
+            data: data.weeks.map(w => w.dogs),
+            backgroundColor: '#D95A2B',
+            borderRadius: 5,
+          },
+          {
+            label: 'Cats',
+            data: data.weeks.map(w => w.cats),
+            backgroundColor: '#8DC63F',
+            borderRadius: 5,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 12 } } }
+        },
+        scales: {
+          x: { grid: { display: false } },
+          y: { beginAtZero: true, grid: { color: '#f0f0f0' }, ticks: { precision: 0 } }
+        }
+      }
+    });
+  }
+
+  init();
+</script>
+</body>
+</html>
